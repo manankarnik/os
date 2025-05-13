@@ -30,7 +30,7 @@ print_hex:
     mov [hex_pattern + di], bl
     inc di
     sub cl, 4
-    cmp cl, 0
+    cmp di, 6
     je .break
     jmp .loop
 .break:
