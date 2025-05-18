@@ -1,5 +1,5 @@
 org 0x7c00
-mov [boot_drive], dl ; BIOS stores boot drive in dl
+mov [boot_drive], dl  ; BIOS stores boot drive in dl
 
 ; Move stack out of the way
 mov bp, 0x8000
@@ -25,21 +25,21 @@ jmp $
 ; dl    - Disk to read from
 read_disk:
     pusha
-    push dx       ; Push dx to store no. of sectors
-    mov ah, 0x02  ; BIOS Read Sector Routine
-    mov al, dh    ; No. of sectors to read
-    mov ch, 0x00  ; Cylinder 0
-    mov dh, 0x00  ; Head 0
-    mov cl, 0x02  ; Sector 2 (1 indexed)
+    push dx             ; Push dx to store no. of sectors
+    mov ah, 0x02        ; BIOS Read Sector Routine
+    mov al, dh          ; No. of sectors to read
+    mov ch, 0x00        ; Cylinder 0
+    mov dh, 0x00        ; Head 0
+    mov cl, 0x02        ; Sector 2 (1 indexed)
 
     int 0x13
-    jc .error     ; Carry flag is set if read failed
-    pop dx        ; Pop dx to retrieve no. of sectors expected
-    cmp dh, al    ; No. of sectors actually read in al
+    jc .error           ; Carry flag is set if read failed
+    pop dx              ; Pop dx to retrieve no. of sectors expected
+    cmp dh, al          ; No. of sectors actually read in al
     jne .error
     jmp .break
 .error:
-    mov si, read_error
+    mov si, read_error  ; Print error message
     call print 
     mov dx, ax
     call print_hex
@@ -61,7 +61,7 @@ print:
     popa
     ret
 
-; dx - String to print
+; dx - Number to print as hex
 print_hex:
     pusha
     mov si, hex_pattern         ; Initiallly 0x0000
@@ -75,7 +75,7 @@ print_hex:
     mov [hex_pattern + di], bl  ; Replace pattern character with hex character
     inc di                      ; Increment index
     sub cl, 4                   ; Reduce shift by 4 (1 byte)
-    cmp di, 6                   ; Check if index == len(0x00000)
+    cmp di, 6                   ; Check if index == len(0x0000)
     je .break
     jmp .loop
 .break:
@@ -84,10 +84,10 @@ print_hex:
     popa
     ret
 
-boot_drive: db 0
 hex_pattern: db "0x0000", 0x0d, 0x0a, 0
-hex_table: db "0123456789abcdef"
-read_error: db "ERROR: Failed to read disk", 0x0d, 0x0a, 0
+hex_table:   db "0123456789abcdef"
+read_error:  db "ERROR: Failed to read disk", 0x0d, 0x0a, 0
+boot_drive:  db 0
 
 times 510-($-$$) db 0
 dw 0xaa55
